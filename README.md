@@ -18,11 +18,11 @@ A dual Agentforce system that transforms workplace accommodation requests — ma
 
 ```mermaid
 flowchart LR
-    E["Employee"] -->|Opens Ada| A["Ada\nAccommodation Advocate"]
-    A -->|Explores options| K["Salesforce Knowledge\n4 Articles — RAG Grounded"]
-    A -->|Drafts letter + submits| C["Accommodation Case\nSalesforce CRM"]
-    C -->|HR notified via Flow| HR["HR Partner"]
-    HR -->|Opens HRBrief| H["HRBrief\nHR Agent"]
+    E[Employee] -->|Opens Ada| A[Ada]
+    A -->|Explores options| K[Salesforce Knowledge]
+    A -->|Drafts letter and submits| C[Accommodation Case]
+    C -->|HR notified via Flow| HR[HR Partner]
+    HR -->|Opens HRBrief| H[HRBrief]
     H -->|Pulls case briefing| C
     H -->|Searches implementation guidance| K
 ```
@@ -33,45 +33,50 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    subgraph UI["User Interfaces"]
-        LWC["Ada LWC\nWCAG 2.1 AA\nAny Lightning Page"]
-        AP["Agentforce Panel\nLightning Experience sidebar"]
-        BP["Agentforce Builder Preview\nHR access"]
+    subgraph UI[User Interfaces]
+        LWC[Ada LWC - WCAG 2.1 AA]
+        AP[Agentforce Panel - Lightning Sidebar]
+        BP[Agentforce Builder - HR Preview]
     end
 
-    subgraph Agents["Agentforce Agents — aiAuthoringBundle"]
-        subgraph AdaAgent["Ada — 5 Subagents"]
-            AR["Intake Router\nHyperClassifier"]
-            AA["Accommodation Advisor\nKnowledge Search"]
-            AL["Letter Generator\nApex Action"]
-            AC["Case Submission\nApex Action"]
-            AS["Status Check\nApex Action"]
-        end
-        subgraph HRAgent["HRBrief — 3 Subagents"]
-            HR2["HR Router\nHyperClassifier"]
-            HB["Case Briefing\nApex Action"]
-            HG["Implementation Guidance\nKnowledge Search"]
-        end
+    subgraph Ada[Ada Agent - 5 Subagents]
+        AR[Intake Router - HyperClassifier]
+        AA[Accommodation Advisor - Knowledge Search]
+        AL[Letter Generator - Apex Action]
+        AC[Case Submission - Apex Action]
+        AS[Status Check - Apex Action]
     end
 
-    subgraph Platform["Salesforce Platform"]
-        PT["GenAI Prompt Template\nsfdc_ai__DefaultGPT5Mini"]
-        CLS["Apex Services\nCaseService · LetterService · StatusService"]
-        FLW["Record-Triggered Flows\nHR Notification · Status Update"]
-        OBJ["Case Object\n5 Custom Fields + Record Type"]
-        KNW["Salesforce Knowledge\n4 Articles — RAG Grounded"]
+    subgraph HRBrief[HRBrief Agent - 3 Subagents]
+        HR2[HR Router - HyperClassifier]
+        HB[Case Briefing - Apex Action]
+        HG[Implementation Guidance - Knowledge Search]
     end
 
-    LWC -->|"ConnectApi.EinsteinLLM\ngenerateMessagesForPromptTemplate"| PT
-    AP --> AdaAgent
-    BP --> HRAgent
-    AR --> AA & AL & AC & AS
+    subgraph Platform[Salesforce Platform]
+        PT[GenAI Prompt Template - GPT5Mini]
+        CLS[Apex Services - Case and Letter and Status]
+        FLW[Record-Triggered Flows]
+        OBJ[Case Object - 5 Custom Fields]
+        KNW[Salesforce Knowledge - 4 Articles RAG]
+    end
+
+    LWC -->|ConnectApi.EinsteinLLM| PT
+    AP --> Ada
+    BP --> HRBrief
+    AR --> AA
+    AR --> AL
+    AR --> AC
+    AR --> AS
     AA -->|RAG search| KNW
-    AL & AC & AS -->|"@InvocableMethod"| CLS
+    AL -->|InvocableMethod| CLS
+    AC -->|InvocableMethod| CLS
+    AS -->|InvocableMethod| CLS
     CLS --> OBJ
     OBJ --> FLW
-    HR2 --> HB & HG
-    HB -->|"@InvocableMethod"| CLS
+    HR2 --> HB
+    HR2 --> HG
+    HB -->|InvocableMethod| CLS
     HG -->|RAG search| KNW
 ```
 
