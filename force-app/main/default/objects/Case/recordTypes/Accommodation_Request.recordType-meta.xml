@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Accommodation_Request</fullName>
+    <active>true</active>
+    <businessProcess>Accommodation_Process</businessProcess>
+    <label>Accommodation Request</label>
+    <picklistValues>
+        <picklist>Accommodation_Type__c</picklist>
+        <values><fullName>Remote Work</fullName><default>false</default></values>
+        <values><fullName>Flexible Hours</fullName><default>false</default></values>
+        <values><fullName>Assistive Technology</fullName><default>false</default></values>
+        <values><fullName>Modified Workspace</fullName><default>false</default></values>
+        <values><fullName>Communication Aids</fullName><default>false</default></values>
+        <values><fullName>Other</fullName><default>false</default></values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Status</picklist>
+        <values><fullName>New</fullName><default>true</default></values>
+        <values><fullName>Working</fullName><default>false</default></values>
+        <values><fullName>Escalated</fullName><default>false</default></values>
+        <values><fullName>Closed</fullName><default>false</default></values>
+    </picklistValues>
+</RecordType>

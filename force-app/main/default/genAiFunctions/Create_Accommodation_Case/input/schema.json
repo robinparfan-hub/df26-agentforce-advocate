@@ -1,0 +1,42 @@
+{
+  "required" : [ "accommodationType", "employeeName", "functionalChallenge", "generatedLetter", "jobRole" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "accommodationType" : {
+      "title" : "Accommodation Type",
+      "description" : "The type of workplace accommodation being requested (e.g. Remote Work, Flexible Hours, Assistive Technology)",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "employeeName" : {
+      "title" : "Employee Name",
+      "description" : "The employee's full legal name as it should appear on the accommodation case",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "functionalChallenge" : {
+      "title" : "Functional Challenge",
+      "description" : "How the employee's condition affects their day-to-day work, in plain language",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "generatedLetter" : {
+      "title" : "Generated Advocacy Letter",
+      "description" : "The full text of the advocacy letter drafted for this request",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "jobRole" : {
+      "title" : "Job Role",
+      "description" : "The employee's current job role or title",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

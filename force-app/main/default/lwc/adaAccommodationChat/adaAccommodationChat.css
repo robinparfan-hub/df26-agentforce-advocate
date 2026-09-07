@@ -1,0 +1,384 @@
+/* === WCAG 2.1 AA Accessible Chat Wrapper for Ada === */
+
+/* CSS custom properties — font size driven by JS for font scaling */
+:host {
+    --ada-font-size: 16px;
+    --ada-color-bg: #ffffff;
+    --ada-color-surface: #f4f6f9;
+    --ada-color-border: #dddbda;
+    --ada-color-text: #181818;
+    --ada-color-text-muted: #514f4d;
+    --ada-color-ada-bubble: #f0f4ff;
+    --ada-color-ada-border: #c5d5ff;
+    --ada-color-user-bubble: #0070d2;
+    --ada-color-user-text: #ffffff;
+    --ada-color-focus: #005fb2;
+    --ada-color-error: #ba0517;
+    --ada-color-error-bg: #fef1ee;
+    --ada-color-success: #2e7d32;
+    --ada-color-success-bg: #edf7ee;
+    --ada-color-accent: #0070d2;
+    --ada-color-header-bg: #032d60;
+    --ada-color-header-text: #ffffff;
+    display: block;
+    font-size: var(--ada-font-size);
+}
+
+/* Skip link — WCAG 2.4.1 */
+.skip-link {
+    position: absolute;
+    top: -9999px;
+    left: 0;
+    background: var(--ada-color-accent);
+    color: #ffffff;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    z-index: 9999;
+    border-radius: 0 0 4px 0;
+    text-decoration: none;
+}
+.skip-link:focus {
+    top: 0;
+}
+
+/* Wrapper */
+.ada-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+    max-width: 680px;
+    margin: 0 auto;
+    background: var(--ada-color-bg);
+    border: 1px solid var(--ada-color-border);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: var(--ada-font-size);
+    font-family: 'Salesforce Sans', Arial, sans-serif;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+/* High contrast mode — WCAG 1.4.3 (min 4.5:1 ratio) */
+.ada-wrapper--high-contrast {
+    --ada-color-bg: #000000;
+    --ada-color-surface: #111111;
+    --ada-color-border: #ffffff;
+    --ada-color-text: #ffffff;
+    --ada-color-text-muted: #cccccc;
+    --ada-color-ada-bubble: #111111;
+    --ada-color-ada-border: #ffffff;
+    --ada-color-user-bubble: #ffff00;
+    --ada-color-user-text: #000000;
+    --ada-color-focus: #ffff00;
+    --ada-color-error: #ff6666;
+    --ada-color-error-bg: #220000;
+    --ada-color-success: #66ff66;
+    --ada-color-success-bg: #002200;
+    --ada-color-accent: #ffff00;
+    --ada-color-header-bg: #000000;
+    --ada-color-header-text: #ffffff;
+}
+
+/* Header */
+.ada-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: var(--ada-color-header-bg);
+    color: var(--ada-color-header-text);
+    flex-shrink: 0;
+}
+
+.ada-header__identity {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+}
+
+.ada-avatar {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.ada-header__title {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--ada-color-header-text);
+}
+
+.ada-header__subtitle {
+    margin: 0;
+    font-size: 0.75rem;
+    opacity: 0.85;
+    color: var(--ada-color-header-text);
+}
+
+/* Accessibility controls */
+.ada-controls {
+    display: flex;
+    gap: 0.375rem;
+    align-items: center;
+}
+
+.ada-control-btn {
+    background: rgba(255,255,255,0.15);
+    color: #ffffff;
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    min-width: 2.5rem;
+    min-height: 2rem; /* WCAG 2.5.5 — 44px target handled by padding */
+}
+
+.ada-control-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+/* Focus visible — WCAG 2.4.7 */
+.ada-control-btn:focus-visible {
+    outline: 3px solid #ffff00;
+    outline-offset: 2px;
+}
+
+.ada-control-btn--active {
+    background: rgba(255,255,255,0.35);
+    border-color: #ffffff;
+}
+
+/* Main chat area */
+.ada-chat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--ada-color-surface);
+}
+
+/* Message log */
+.ada-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    /* Scroll behavior is smooth for reduced motion off */
+    scroll-behavior: smooth;
+}
+
+/* Respect reduced motion preference — WCAG 2.3.3 */
+@media (prefers-reduced-motion: reduce) {
+    .ada-messages { scroll-behavior: auto; }
+    .typing-dot { animation: none; opacity: 0.5; }
+}
+
+/* Message bubbles */
+.ada-message {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    max-width: 85%;
+}
+
+.ada-message--ada {
+    align-self: flex-start;
+}
+
+.ada-message--user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.ada-message__avatar {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-bottom: 0.25rem;
+}
+
+.ada-message__bubble {
+    padding: 0.625rem 0.875rem;
+    border-radius: 12px;
+    max-width: 100%;
+}
+
+.ada-message--ada .ada-message__bubble {
+    background: var(--ada-color-ada-bubble);
+    border: 1px solid var(--ada-color-ada-border);
+    border-bottom-left-radius: 2px;
+}
+
+.ada-message--user .ada-message__bubble {
+    background: var(--ada-color-user-bubble);
+    color: var(--ada-color-user-text);
+    border-bottom-right-radius: 2px;
+}
+
+.ada-message__text {
+    margin: 0 0 0.25rem 0;
+    line-height: 1.5;
+    color: var(--ada-color-text);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.ada-message--user .ada-message__text {
+    color: var(--ada-color-user-text);
+}
+
+.ada-message__time {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--ada-color-text-muted);
+    text-align: right;
+}
+
+.ada-message--user .ada-message__time {
+    color: rgba(255,255,255,0.75);
+}
+
+/* Typing indicator */
+.ada-message--typing .ada-message__bubble {
+    padding: 0.75rem 1rem;
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--ada-color-text-muted);
+    border-radius: 50%;
+    animation: typing-bounce 1.2s infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing-bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* Status messages */
+.ada-status {
+    margin: 0.5rem 1rem;
+    padding: 0.625rem 0.875rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.ada-status--error {
+    background: var(--ada-color-error-bg);
+    color: var(--ada-color-error);
+    border: 1px solid var(--ada-color-error);
+}
+
+.ada-status--success {
+    background: var(--ada-color-success-bg);
+    color: var(--ada-color-success);
+    border: 1px solid var(--ada-color-success);
+}
+
+/* Input area */
+.ada-input-area {
+    padding: 0.75rem 1rem;
+    background: var(--ada-color-bg);
+    border-top: 1px solid var(--ada-color-border);
+    flex-shrink: 0;
+}
+
+.ada-input-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-end;
+}
+
+.ada-input {
+    flex: 1;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid var(--ada-color-border);
+    border-radius: 6px;
+    font-size: var(--ada-font-size);
+    font-family: inherit;
+    resize: none;
+    line-height: 1.5;
+    color: var(--ada-color-text);
+    background: var(--ada-color-bg);
+    transition: border-color 0.15s;
+}
+
+.ada-input:focus {
+    outline: none;
+    border-color: var(--ada-color-focus);
+    box-shadow: 0 0 0 3px rgba(0,95,178,0.25);
+}
+
+.ada-wrapper--high-contrast .ada-input:focus {
+    box-shadow: 0 0 0 3px #ffff00;
+    border-color: #ffff00;
+}
+
+.ada-input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.ada-send-btn {
+    background: var(--ada-color-accent);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s, opacity 0.15s;
+}
+
+.ada-send-btn:hover:not(:disabled) {
+    background: #005fb2;
+}
+
+.ada-send-btn:focus-visible {
+    outline: 3px solid var(--ada-color-focus);
+    outline-offset: 2px;
+}
+
+.ada-send-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.ada-input-hint {
+    margin: 0.375rem 0 0 0;
+    font-size: 0.75rem;
+    color: var(--ada-color-text-muted);
+    line-height: 1.4;
+}
+
+/* Assistive text (visually hidden but read by screen readers) */
+.slds-assistive-text {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    clip: rect(0 0 0 0) !important;
+    clip-path: inset(50%) !important;
+    white-space: nowrap !important;
+}

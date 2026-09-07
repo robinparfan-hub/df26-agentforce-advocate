@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Creates a formal accommodation request case in Salesforce</description>
+    <developerName>Create_Accommodation_Case</developerName>
+    <invocationTarget>AccommodationCaseService</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+    <localDeveloperName>Create_Accommodation_Case</localDeveloperName>
+    <masterLabel>Create Accommodation Case</masterLabel>
+</GenAiFunction>

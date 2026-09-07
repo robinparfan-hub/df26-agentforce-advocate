@@ -1,0 +1,141 @@
+<template>
+    <!-- Skip navigation link (WCAG 2.4.1) -->
+    <a href="#ada-chat-main" class="skip-link" onclick={handleSkipLink}>
+        Skip to conversation
+    </a>
+
+    <div class="ada-wrapper" role="application" aria-label="Ada — Accommodation Advocate">
+
+        <!-- Header toolbar -->
+        <div class="ada-header" role="banner">
+            <div class="ada-header__identity">
+                <span class="ada-avatar" aria-hidden="true">🤝</span>
+                <div>
+                    <h1 class="ada-header__title">Ada</h1>
+                    <p class="ada-header__subtitle">Accommodation Advocate — Confidential</p>
+                </div>
+            </div>
+
+            <!-- Accessibility controls (WCAG 1.4.3, 1.4.4) -->
+            <div class="ada-controls" role="group" aria-label="Accessibility options">
+                <button
+                    class={highContrastButtonClass}
+                    onclick={toggleHighContrast}
+                    aria-pressed={isHighContrast}
+                    title="Toggle high contrast mode"
+                    type="button">
+                    ◑ Contrast
+                </button>
+                <button
+                    class="ada-control-btn"
+                    onclick={decreaseFontSize}
+                    aria-label="Decrease text size"
+                    title="Decrease text size"
+                    type="button">
+                    A−
+                </button>
+                <button
+                    class="ada-control-btn"
+                    onclick={increaseFontSize}
+                    aria-label="Increase text size"
+                    title="Increase text size"
+                    type="button">
+                    A+
+                </button>
+            </div>
+        </div>
+
+        <!-- Main chat region -->
+        <main id="ada-chat-main" class="ada-chat" aria-label="Conversation with Ada">
+
+            <!-- ARIA live region announces new messages (WCAG 4.1.3) -->
+            <div
+                aria-live="polite"
+                aria-atomic="false"
+                aria-relevant="additions"
+                class="slds-assistive-text"
+                lwc:ref="liveRegion">
+                {liveRegionText}
+            </div>
+
+            <!-- Message list -->
+            <div class="ada-messages" role="log" aria-label="Conversation history" aria-live="off" lwc:ref="messageLog">
+                <template for:each={messages} for:item="msg">
+                    <div
+                        key={msg.id}
+                        class={msg.cssClass}
+                        role="article"
+                        aria-label={msg.ariaLabel}>
+                        <template if:true={msg.isAda}>
+                            <span class="ada-message__avatar" aria-hidden="true">🤝</span>
+                        </template>
+                        <div class="ada-message__bubble">
+                            <p class="ada-message__text">{msg.text}</p>
+                            <time class="ada-message__time" datetime={msg.isoTime} aria-label={msg.timeLabel}>
+                                {msg.displayTime}
+                            </time>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Typing indicator -->
+                <template if:true={isTyping}>
+                    <div class="ada-message ada-message--ada ada-message--typing" role="status" aria-label="Ada is responding">
+                        <span class="ada-message__avatar" aria-hidden="true">🤝</span>
+                        <div class="ada-message__bubble">
+                            <span class="typing-dot" aria-hidden="true"></span>
+                            <span class="typing-dot" aria-hidden="true"></span>
+                            <span class="typing-dot" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Status bar (errors / confirmations) -->
+            <template if:true={statusMessage}>
+                <div
+                    class={statusCssClass}
+                    role="alert"
+                    aria-live="assertive"
+                    aria-atomic="true">
+                    <span aria-hidden="true">{statusIcon}</span>
+                    {statusMessage}
+                </div>
+            </template>
+        </main>
+
+        <!-- Input area -->
+        <footer class="ada-input-area" role="contentinfo">
+            <label for="ada-input" class="slds-assistive-text">
+                Type your message to Ada
+            </label>
+            <form class="ada-input-form" onsubmit={handleFormSubmit}>
+            <div class="ada-input-row">
+                <textarea
+                    id="ada-input"
+                    class="ada-input"
+                    placeholder="Share what's been making work difficult…"
+                    onkeydown={handleKeyDown}
+                    oninput={handleInput}
+                    aria-label="Message to Ada"
+                    aria-describedby="ada-input-hint"
+                    rows="2"
+                    maxlength="2000"
+                    disabled={isSending}>
+                </textarea>
+                <button
+                    class="ada-send-btn"
+                    onclick={sendMessage}
+                    disabled={isSendDisabled}
+                    aria-label="Send message"
+                    type="button">
+                    <span aria-hidden="true">→</span>
+                </button>
+            </div>
+            </form>
+            <p id="ada-input-hint" class="ada-input-hint">
+                Press Enter to send, Shift+Enter for a new line. This conversation is confidential.
+            </p>
+        </footer>
+    </div>
+</template>

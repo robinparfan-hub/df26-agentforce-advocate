@@ -1,0 +1,13 @@
+{
+  "packageDirectories": [
+    {
+      "path": "force-app",
+      "default": true
+    }
+  ],
+  "name": "advocate-agent",
+  "description": "Advocate — dual Agentforce system for WCAG 2.1 AA accessible workplace accommodation requests. Dreamforce 2026 Agentforce for Good Hackathon.",
+  "namespace": "",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "67.0"
+}

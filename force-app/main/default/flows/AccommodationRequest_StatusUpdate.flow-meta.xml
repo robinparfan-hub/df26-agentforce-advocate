@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>62.0</apiVersion>
+    <description>Updates plain language status and sends email to employee when accommodation case status changes.</description>
+    <label>Accommodation Request - Status Update</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value><stringValue>LightningFlowBuilder</stringValue></value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>176</locationX>
+        <locationY>0</locationY>
+        <filterFormula>{!$Record.RecordType.DeveloperName} = &apos;Accommodation_Request&apos; &amp;&amp; ISCHANGED({!$Record.Status})</filterFormula>
+        <object>Case</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+        <connector>
+            <targetReference>Check_Status</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <decisions>
+        <name>Check_Status</name>
+        <label>Check New Status</label>
+        <locationX>176</locationX>
+        <locationY>120</locationY>
+        <defaultConnector>
+            <targetReference>Set_Default_Status</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Other</defaultConnectorLabel>
+        <rules>
+            <name>Status_New</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Status</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue><stringValue>New</stringValue></rightValue>
+            </conditions>
+            <connector><targetReference>Set_Status_New</targetReference></connector>
+            <label>New</label>
+        </rules>
+        <rules>
+            <name>Status_Working</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Status</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue><stringValue>Working</stringValue></rightValue>
+            </conditions>
+            <connector><targetReference>Set_Status_Working</targetReference></connector>
+            <label>Working</label>
+        </rules>
+        <rules>
+            <name>Status_Escalated</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Status</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue><stringValue>Escalated</stringValue></rightValue>
+            </conditions>
+            <connector><targetReference>Set_Status_Escalated</targetReference></connector>
+            <label>Escalated</label>
+        </rules>
+        <rules>
+            <name>Status_Closed</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Status</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue><stringValue>Closed</stringValue></rightValue>
+            </conditions>
+            <connector><targetReference>Set_Status_Closed</targetReference></connector>
+            <label>Closed</label>
+        </rules>
+    </decisions>
+    <assignments>
+        <name>Set_Status_New</name>
+        <label>Set Plain Language - New</label>
+        <locationX>0</locationX>
+        <locationY>240</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Plain_Language_Status__c</assignToReference>
+            <operator>Assign</operator>
+            <value><stringValue>Your request has been received. HR will confirm within 1 business day.</stringValue></value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Set_Status_Working</name>
+        <label>Set Plain Language - Working</label>
+        <locationX>176</locationX>
+        <locationY>240</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Plain_Language_Status__c</assignToReference>
+            <operator>Assign</operator>
+            <value><stringValue>Good news — your request is being actively reviewed by HR. You should hear back within 3 to 5 business days.</stringValue></value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Set_Status_Escalated</name>
+        <label>Set Plain Language - Escalated</label>
+        <locationX>352</locationX>
+        <locationY>240</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Plain_Language_Status__c</assignToReference>
+            <operator>Assign</operator>
+            <value><stringValue>Your request has been reviewed and escalated to a senior HR partner. You will receive a final decision within 2 business days.</stringValue></value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Set_Status_Closed</name>
+        <label>Set Plain Language - Closed</label>
+        <locationX>528</locationX>
+        <locationY>240</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Plain_Language_Status__c</assignToReference>
+            <operator>Assign</operator>
+            <value><stringValue>Your accommodation request has been resolved. Please check your email for details on your approved accommodations and next steps.</stringValue></value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Set_Default_Status</name>
+        <label>Set Plain Language - Default</label>
+        <locationX>704</locationX>
+        <locationY>240</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Plain_Language_Status__c</assignToReference>
+            <operator>Assign</operator>
+            <value><stringValue>Your request status has been updated. Contact HR if you have questions.</stringValue></value>
+        </assignmentItems>
+    </assignments>
+</Flow>

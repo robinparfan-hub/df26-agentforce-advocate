@@ -1,0 +1,14 @@
+{
+  "required" : [ "caseId" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "caseId" : {
+      "title" : "Case Id",
+      "description" : "Salesforce record ID of the accommodation case (18-character ID starting with 500)",
+      "lightning:type" : "lightning__recordIdType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

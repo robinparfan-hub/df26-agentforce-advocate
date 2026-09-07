@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Generates a professional accommodation request letter using Einstein GenAI</description>
+    <developerName>Generate_Advocacy_Letter</developerName>
+    <invocationTarget>AccommodationLetterService</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+    <localDeveloperName>Generate_Advocacy_Letter</localDeveloperName>
+    <masterLabel>Generate Advocacy Letter</masterLabel>
+</GenAiFunction>

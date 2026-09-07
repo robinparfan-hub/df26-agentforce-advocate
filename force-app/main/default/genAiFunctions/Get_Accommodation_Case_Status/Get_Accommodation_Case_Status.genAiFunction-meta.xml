@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Returns the current status of an accommodation request in plain language</description>
+    <developerName>Get_Accommodation_Case_Status</developerName>
+    <invocationTarget>AccommodationStatusService</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+    <localDeveloperName>Get_Accommodation_Case_Status</localDeveloperName>
+    <masterLabel>Get Accommodation Case Status</masterLabel>
+</GenAiFunction>

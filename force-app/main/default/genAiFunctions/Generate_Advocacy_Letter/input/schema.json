@@ -1,0 +1,42 @@
+{
+  "required" : [ "accommodationType", "employeeName", "functionalChallenge", "jobRole" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "accommodationType" : {
+      "title" : "Accommodation Type Requested",
+      "description" : "The accommodation type being requested",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "employeeName" : {
+      "title" : "Employee Name",
+      "description" : "Employee's full name as it should appear in the letter",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "functionalChallenge" : {
+      "title" : "Functional Challenge Description",
+      "description" : "Description of the challenge and how it affects their work",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "jobRole" : {
+      "title" : "Job Role",
+      "description" : "Employee's current job role or title",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "managerName" : {
+      "title" : "Manager Name (optional)",
+      "description" : "Optional: manager's name for a personalized salutation",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}
