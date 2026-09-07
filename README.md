@@ -18,13 +18,13 @@ A dual Agentforce system that transforms workplace accommodation requests — ma
 
 ```mermaid
 graph LR
-    E["Employee"] -->|"Opens Ada"| A["Ada"]
-    A -->|"Explores options"| K["Salesforce Knowledge"]
-    A -->|"Drafts letter and submits"| C["Accommodation Case"]
-    C -->|"Notified via Flow"| HRP["HR Partner"]
-    HRP -->|"Opens HRBrief"| HRB["HRBrief"]
-    HRB -->|"Pulls case briefing"| C
-    HRB -->|"Searches guidance"| K
+    E[Employee] -->|Opens Ada| A[Ada]
+    A -->|Explores options| K[Salesforce Knowledge]
+    A -->|Drafts letter and submits| C[Accommodation Case]
+    C -->|Notified via Flow| HRP[HR Partner]
+    HRP -->|Opens HRBrief| HRB[HRBrief]
+    HRB -->|Pulls case briefing| C
+    HRB -->|Searches guidance| K
 ```
 
 ---
@@ -33,32 +33,32 @@ graph LR
 
 ```mermaid
 graph TD
-    subgraph ui["User Interfaces"]
-        LWC["Ada LWC - WCAG 2.1 AA"]
-        AP["Agentforce Panel"]
-        BP["Agentforce Builder"]
+    subgraph ui[User Interfaces]
+        LWC[Ada LWC]
+        AP[Agentforce Panel]
+        BP[Agentforce Builder]
     end
 
-    subgraph ada["Ada Agent - 5 Subagents"]
-        AR["Intake Router"]
-        AA["Accommodation Advisor"]
-        AL["Letter Generator"]
-        AC["Case Submission"]
-        AS["Status Check"]
+    subgraph ada[Ada Agent]
+        AR[Intake Router]
+        AA[Accommodation Advisor]
+        AL[Letter Generator]
+        AC[Case Submission]
+        AS[Status Check]
     end
 
-    subgraph hrb["HRBrief Agent - 3 Subagents"]
-        HR2["HR Router"]
-        HB["Case Briefing"]
-        HG["Implementation Guidance"]
+    subgraph hrb[HRBrief Agent]
+        HR2[HR Router]
+        HB[Case Briefing]
+        HG[Implementation Guidance]
     end
 
-    subgraph plat["Salesforce Platform"]
-        PT["Prompt Template - GPT5Mini"]
-        CLS["Apex Services"]
-        OBJ["Case Object"]
-        KNW["Salesforce Knowledge"]
-        FLW["Record-Triggered Flows"]
+    subgraph plat[Salesforce Platform]
+        PT[Prompt Template]
+        CLS[Apex Services]
+        OBJ[Case Object]
+        KNW[Salesforce Knowledge]
+        FLW[Flows]
     end
 
     LWC --> PT
