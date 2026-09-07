@@ -12,6 +12,8 @@ A dual Agentforce system that transforms workplace accommodation requests — ma
 
 **HRBrief** — the HR partner agent — gives HR teams the context they need to act: plain-language case briefings pulled directly from Salesforce, implementation guidance from company Knowledge, and status tracking — without surfacing unnecessary personal detail.
 
+**Architecture diagrams (functional + technical):** [Google Slides](https://docs.google.com/presentation/d/1wHgX_eupXnki_wpGvvON3ACCSh8_6qFTmbytSzIgHbI/edit?usp=sharing)
+
 ---
 
 ## Stack
