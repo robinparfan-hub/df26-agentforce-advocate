@@ -14,70 +14,70 @@ A dual Agentforce system that transforms workplace accommodation requests — ma
 
 ---
 
-## How It Works — Functional View
+## How It Works
 
 ```mermaid
-flowchart LR
-    E[Employee] -->|Opens Ada| A[Ada]
-    A -->|Explores options| K[Salesforce Knowledge]
-    A -->|Drafts letter and submits| C[Accommodation Case]
-    C -->|HR notified via Flow| HR[HR Partner]
-    HR -->|Opens HRBrief| H[HRBrief]
-    H -->|Pulls case briefing| C
-    H -->|Searches implementation guidance| K
+graph LR
+    E["Employee"] -->|"Opens Ada"| A["Ada"]
+    A -->|"Explores options"| K["Salesforce Knowledge"]
+    A -->|"Drafts letter and submits"| C["Accommodation Case"]
+    C -->|"Notified via Flow"| HRP["HR Partner"]
+    HRP -->|"Opens HRBrief"| HRB["HRBrief"]
+    HRB -->|"Pulls case briefing"| C
+    HRB -->|"Searches guidance"| K
 ```
 
 ---
 
-## Architecture — Technical View
+## Architecture
 
 ```mermaid
-flowchart TD
-    subgraph UI[User Interfaces]
-        LWC[Ada LWC - WCAG 2.1 AA]
-        AP[Agentforce Panel - Lightning Sidebar]
-        BP[Agentforce Builder - HR Preview]
+graph TD
+    subgraph ui["User Interfaces"]
+        LWC["Ada LWC - WCAG 2.1 AA"]
+        AP["Agentforce Panel"]
+        BP["Agentforce Builder"]
     end
 
-    subgraph Ada[Ada Agent - 5 Subagents]
-        AR[Intake Router - HyperClassifier]
-        AA[Accommodation Advisor - Knowledge Search]
-        AL[Letter Generator - Apex Action]
-        AC[Case Submission - Apex Action]
-        AS[Status Check - Apex Action]
+    subgraph ada["Ada Agent - 5 Subagents"]
+        AR["Intake Router"]
+        AA["Accommodation Advisor"]
+        AL["Letter Generator"]
+        AC["Case Submission"]
+        AS["Status Check"]
     end
 
-    subgraph HRBrief[HRBrief Agent - 3 Subagents]
-        HR2[HR Router - HyperClassifier]
-        HB[Case Briefing - Apex Action]
-        HG[Implementation Guidance - Knowledge Search]
+    subgraph hrb["HRBrief Agent - 3 Subagents"]
+        HR2["HR Router"]
+        HB["Case Briefing"]
+        HG["Implementation Guidance"]
     end
 
-    subgraph Platform[Salesforce Platform]
-        PT[GenAI Prompt Template - GPT5Mini]
-        CLS[Apex Services - Case and Letter and Status]
-        FLW[Record-Triggered Flows]
-        OBJ[Case Object - 5 Custom Fields]
-        KNW[Salesforce Knowledge - 4 Articles RAG]
+    subgraph plat["Salesforce Platform"]
+        PT["Prompt Template - GPT5Mini"]
+        CLS["Apex Services"]
+        OBJ["Case Object"]
+        KNW["Salesforce Knowledge"]
+        FLW["Record-Triggered Flows"]
     end
 
-    LWC -->|ConnectApi.EinsteinLLM| PT
-    AP --> Ada
-    BP --> HRBrief
+    LWC --> PT
+    AP --> AR
+    BP --> HR2
     AR --> AA
     AR --> AL
     AR --> AC
     AR --> AS
-    AA -->|RAG search| KNW
-    AL -->|InvocableMethod| CLS
-    AC -->|InvocableMethod| CLS
-    AS -->|InvocableMethod| CLS
+    AA --> KNW
+    AL --> CLS
+    AC --> CLS
+    AS --> CLS
     CLS --> OBJ
     OBJ --> FLW
     HR2 --> HB
     HR2 --> HG
-    HB -->|InvocableMethod| CLS
-    HG -->|RAG search| KNW
+    HB --> CLS
+    HG --> KNW
 ```
 
 ---
@@ -104,8 +104,8 @@ flowchart TD
 |---|---|
 | 2.4.1 Bypass Blocks | Skip navigation link to main conversation |
 | 4.1.3 Status Messages | `aria-live="polite"` region announces all responses |
-| 1.4.3 Contrast | High contrast toggle (black/yellow, ≥4.5:1) |
-| 1.4.4 Resize Text | Font scaling 14px–22px via A−/A+ controls |
+| 1.4.3 Contrast | High contrast toggle (black/yellow, 4.5:1 minimum) |
+| 1.4.4 Resize Text | Font scaling 14px to 22px via keyboard-accessible controls |
 | 2.1.1 Keyboard | Full keyboard nav; Enter to send, Shift+Enter for newline |
 | 2.3.3 Animation | `prefers-reduced-motion` disables typing indicator |
 | 2.4.7 Focus Visible | 3px `:focus-visible` outlines on all interactive elements |
@@ -151,7 +151,6 @@ force-app/main/default/
 ### Deploy
 
 ```bash
-# Deploy everything: data model, Apex, Flows, LWC, agents, prompt template
 NODE_TLS_REJECT_UNAUTHORIZED=0 sf project deploy start \
   --source-dir force-app/main/default \
   --target-org advocate-org
@@ -159,16 +158,16 @@ NODE_TLS_REJECT_UNAUTHORIZED=0 sf project deploy start \
 
 ### Post-deploy steps (required)
 
-1. **Register Agentforce Actions** (Setup → Agentforce → Agent Actions → New):
+1. **Register Agentforce Actions** (Setup > Agentforce > Agent Actions > New):
    - `Create Accommodation Case` → `AccommodationCaseService`
    - `Generate Advocacy Letter` → `AccommodationLetterService`
    - `Get Accommodation Case Status` → `AccommodationStatusService`
 
-2. **Activate the prompt template** (Setup → Prompt Builder → Ada Accommodation Chat → Activate)
+2. **Activate the prompt template** (Setup > Prompt Builder > Ada Accommodation Chat > Activate)
 
-3. **Activate both agents** (Agentforce Studio → each agent → Commit Version → Activate)
+3. **Activate both agents** (Agentforce Studio > each agent > Commit Version > Activate)
 
-4. **Add Ada LWC to a Lightning page** (App Builder → drag `adaAccommodationChat` component)
+4. **Add Ada LWC to a Lightning page** (App Builder > drag `adaAccommodationChat` component)
 
 ---
 
