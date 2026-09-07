@@ -172,28 +172,6 @@ NODE_TLS_REJECT_UNAUTHORIZED=0 sf project deploy start \
 
 ---
 
-## Key Technical Notes
-
-### Agentforce Action source naming
-
-The `source` field in the `.agent` DSL maps to the Agentforce Action developer name — not the raw Apex class name:
-
-| @InvocableMethod label | source value |
-|---|---|
-| `Create Accommodation Case` | `Create_Accommodation_Case` |
-| `Generate Advocacy Letter` | `Generate_Advocacy_Letter` |
-| `Get Accommodation Case Status` | `Get_Accommodation_Case_Status` |
-
-### bundle-meta.xml
-
-Do NOT include a `<target>` element in `AiAuthoringBundle` bundle-meta.xml files — it causes a deploy error.
-
-### GenAI Prompt Template
-
-Do NOT include `<versionIdentifier>` in the template XML — Salesforce generates it internally. After deploy, the template must be manually activated in Prompt Builder before it can be invoked.
-
----
-
 ## License
 
 MIT
