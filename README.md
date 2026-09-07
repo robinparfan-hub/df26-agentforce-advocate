@@ -1,37 +1,79 @@
 # Advocate
 
-**An Agentforce for Good submission for Dreamforce 2026.**
+**Agentforce for Good — Dreamforce 2026 Hackathon**
 
-Advocate is a dual Agentforce system that transforms workplace accommodation requests — making them faster, more dignified, and fully auditable for both employees and HR.
+A dual Agentforce system that transforms workplace accommodation requests — making them faster, more dignified, and fully auditable for both employees and HR.
 
 ---
 
 ## What It Does
 
-**Ada** — the employee-facing agent — guides employees through the accommodation process at their own pace: exploring options, drafting a professional advocacy letter, submitting a Case, and checking on its status. Accessible via a WCAG 2.1 AA-compliant LWC chat interface embedded in any Lightning page.
+**Ada** — the employee-facing agent — guides employees through the accommodation process at their own pace: exploring options, drafting a professional advocacy letter, submitting a Case, and checking on its status. Accessible via the native Agentforce panel in Lightning Experience and a purpose-built WCAG 2.1 AA-compliant LWC chat interface.
 
-**HRBrief** — the HR partner agent — gives managers and HR teams the context they need to act: plain-language case briefings, implementation guidance from company policy, and status tracking — without exposing unnecessary medical detail.
+**HRBrief** — the HR partner agent — gives HR teams the context they need to act: plain-language case briefings pulled directly from Salesforce, implementation guidance from company Knowledge, and status tracking — without surfacing unnecessary personal detail.
 
 ---
 
-## Architecture
+## How It Works — Functional View
 
-```
-Employee → Ada (LWC) → Agentforce Agent
-                        ├── intake (router)
-                        ├── accommodation_options (Knowledge search)
-                        ├── letter_generation (Apex: AccommodationLetterService)
-                        ├── case_submission (Apex: AccommodationCaseService)
-                        └── status_check (Apex: AccommodationStatusService)
-
-HR → HRBrief → Agentforce Agent
-                 ├── hr_router (router)
-                 ├── accommodation_briefing (Apex: AccommodationStatusService)
-                 ├── implementation_guidance (Knowledge search)
-                 └── off_topic
+```mermaid
+flowchart LR
+    E["Employee"] -->|Opens Ada| A["Ada\nAccommodation Advocate"]
+    A -->|Explores options| K["Salesforce Knowledge\n4 Articles — RAG Grounded"]
+    A -->|Drafts letter + submits| C["Accommodation Case\nSalesforce CRM"]
+    C -->|HR notified via Flow| HR["HR Partner"]
+    HR -->|Opens HRBrief| H["HRBrief\nHR Agent"]
+    H -->|Pulls case briefing| C
+    H -->|Searches implementation guidance| K
 ```
 
-Both agents are deployed as `aiAuthoringBundle` metadata — fully version-controlled, deployable via Salesforce CLI.
+---
+
+## Architecture — Technical View
+
+```mermaid
+flowchart TD
+    subgraph UI["User Interfaces"]
+        LWC["Ada LWC\nWCAG 2.1 AA\nAny Lightning Page"]
+        AP["Agentforce Panel\nLightning Experience sidebar"]
+        BP["Agentforce Builder Preview\nHR access"]
+    end
+
+    subgraph Agents["Agentforce Agents — aiAuthoringBundle"]
+        subgraph AdaAgent["Ada — 5 Subagents"]
+            AR["Intake Router\nHyperClassifier"]
+            AA["Accommodation Advisor\nKnowledge Search"]
+            AL["Letter Generator\nApex Action"]
+            AC["Case Submission\nApex Action"]
+            AS["Status Check\nApex Action"]
+        end
+        subgraph HRAgent["HRBrief — 3 Subagents"]
+            HR2["HR Router\nHyperClassifier"]
+            HB["Case Briefing\nApex Action"]
+            HG["Implementation Guidance\nKnowledge Search"]
+        end
+    end
+
+    subgraph Platform["Salesforce Platform"]
+        PT["GenAI Prompt Template\nsfdc_ai__DefaultGPT5Mini"]
+        CLS["Apex Services\nCaseService · LetterService · StatusService"]
+        FLW["Record-Triggered Flows\nHR Notification · Status Update"]
+        OBJ["Case Object\n5 Custom Fields + Record Type"]
+        KNW["Salesforce Knowledge\n4 Articles — RAG Grounded"]
+    end
+
+    LWC -->|"ConnectApi.EinsteinLLM\ngenerateMessagesForPromptTemplate"| PT
+    AP --> AdaAgent
+    BP --> HRAgent
+    AR --> AA & AL & AC & AS
+    AA -->|RAG search| KNW
+    AL & AC & AS -->|"@InvocableMethod"| CLS
+    CLS --> OBJ
+    OBJ --> FLW
+    HR2 --> HB & HG
+    HB -->|"@InvocableMethod"| CLS
+    HG -->|RAG search| KNW
+```
 
 ---
 
@@ -40,9 +82,11 @@ Both agents are deployed as `aiAuthoringBundle` metadata — fully version-contr
 | Layer | Technology |
 |---|---|
 | Agents | Agentforce `aiAuthoringBundle` / `.agent` DSL |
-| Actions | Apex `@InvocableMethod` (3 classes) |
+| Actions | Apex `@InvocableMethod` (3 services) |
 | Knowledge | Salesforce Knowledge + Data Cloud (RAG) |
 | UI | Lightning Web Components (WCAG 2.1 AA) |
+| AI — LWC | Einstein GenAI Prompt Template (`sfdc_ai__DefaultGPT5Mini`) |
+| AI — Agents | Einstein HyperClassifier (routing) + org-default LLM (subagents) |
 | Automation | Record-Triggered Flows (2) |
 | Data model | Case (5 custom fields, 1 custom Record Type) |
 | Deploy | Salesforce CLI `sf` v2 |
@@ -50,8 +94,6 @@ Both agents are deployed as `aiAuthoringBundle` metadata — fully version-contr
 ---
 
 ## WCAG 2.1 AA Compliance (Ada LWC)
-
-The chat interface is built to WCAG 2.1 AA from the ground up:
 
 | Criterion | Implementation |
 |---|---|
@@ -70,8 +112,8 @@ The chat interface is built to WCAG 2.1 AA from the ground up:
 ```
 force-app/main/default/
 ├── aiAuthoringBundles/
-│   ├── Ada/                         # Employee accommodation agent
-│   └── HRBrief/                     # HR partner briefing agent
+│   ├── Ada/                              # Employee accommodation agent
+│   └── HRBrief/                          # HR partner briefing agent
 ├── classes/
 │   ├── AccommodationCaseService.cls      # Create Accommodation Case
 │   ├── AccommodationLetterService.cls    # Generate Advocacy Letter
@@ -79,10 +121,12 @@ force-app/main/default/
 ├── flows/
 │   ├── AccommodationRequest_HRNotification.flow-meta.xml
 │   └── AccommodationRequest_StatusUpdate.flow-meta.xml
+├── genAiFunctions/                       # Agentforce Action registrations
+├── genAiPromptTemplates/                 # Ada LWC prompt template
 ├── lwc/
 │   └── adaAccommodationChat/            # WCAG 2.1 AA chat wrapper
 └── objects/Case/
-    ├── fields/                          # 5 custom fields
+    ├── fields/                           # 5 custom fields
     └── recordTypes/Accommodation_Request.recordType-meta.xml
 ```
 
@@ -99,43 +143,27 @@ force-app/main/default/
 
 > On machines with corporate SSL inspection, prefix all `sf` commands with `NODE_TLS_REJECT_UNAUTHORIZED=0`.
 
-### Deploy metadata
+### Deploy
 
 ```bash
-cd advocate-agent
-
-# Deploy data model + Apex + Flows + LWC
+# Deploy everything: data model, Apex, Flows, LWC, agents, prompt template
 NODE_TLS_REJECT_UNAUTHORIZED=0 sf project deploy start \
   --source-dir force-app/main/default \
-  --ignore-conflicts \
-  --target-org advocate-org
-
-# Deploy agents
-NODE_TLS_REJECT_UNAUTHORIZED=0 sf project deploy start \
-  --source-dir force-app/main/default/aiAuthoringBundles \
   --target-org advocate-org
 ```
 
-### Post-deploy wiring (required)
+### Post-deploy steps (required)
 
-Before the agents are fully operational, complete these steps in Setup:
-
-1. **Create Agentforce Actions** (Setup → Agentforce → Agent Actions → New):
+1. **Register Agentforce Actions** (Setup → Agentforce → Agent Actions → New):
    - `Create Accommodation Case` → `AccommodationCaseService`
    - `Generate Advocacy Letter` → `AccommodationLetterService`
    - `Get Accommodation Case Status` → `AccommodationStatusService`
 
-2. **Wire Knowledge Data Library** (Ada agent → Builder → Data → Data Library):
-   - Connect your Salesforce Knowledge articles to the Data Library
-   - Save and retrieve the bundle to capture `rag_feature_config_id`
+2. **Activate the prompt template** (Setup → Prompt Builder → Ada Accommodation Chat → Activate)
 
-3. **Wire HRBrief actions in Builder**:
-   - Open HRBrief → Accommodation Briefing subagent
-   - Add `Get Accommodation Case Status` from Action Library → Save
+3. **Activate both agents** (Agentforce Studio → each agent → Commit Version → Activate)
 
-4. **Activate both agents** (Builder → Commit Version → Activate)
-
-5. **Add Ada to a Lightning page** (App Builder → drag `adaAccommodationChat` component)
+4. **Add Ada LWC to a Lightning page** (App Builder → drag `adaAccommodationChat` component)
 
 ---
 
@@ -143,7 +171,7 @@ Before the agents are fully operational, complete these steps in Setup:
 
 ### Agentforce Action source naming
 
-The `source` field in the `.agent` DSL must reference a registered Agentforce Action developer name — not the raw Apex class name. The developer name is the `@InvocableMethod` label with spaces replaced by underscores:
+The `source` field in the `.agent` DSL maps to the Agentforce Action developer name — not the raw Apex class name:
 
 | @InvocableMethod label | source value |
 |---|---|
@@ -151,17 +179,13 @@ The `source` field in the `.agent` DSL must reference a registered Agentforce Ac
 | `Generate Advocacy Letter` | `Generate_Advocacy_Letter` |
 | `Get Accommodation Case Status` | `Get_Accommodation_Case_Status` |
 
-The canonical way to discover actual source names: wire actions in Builder → retrieve the bundle → read the `.agent` file.
-
 ### bundle-meta.xml
 
-Do NOT include a `<target>` element in `AiAuthoringBundle` bundle-meta.xml files. Including it causes a "no BotVersion found" deploy error.
+Do NOT include a `<target>` element in `AiAuthoringBundle` bundle-meta.xml files — it causes a deploy error.
 
----
+### GenAI Prompt Template
 
-## Demo Persona
-
-**Jordan Reyes** — engineer, 3 months in, has ADHD and chronic migraine. Has been dreading the accommodation conversation. Opens Ada from their employee portal during a quiet moment. Gets help the same day.
+Do NOT include `<versionIdentifier>` in the template XML — Salesforce generates it internally. After deploy, the template must be manually activated in Prompt Builder before it can be invoked.
 
 ---
 
